@@ -14,26 +14,25 @@ stages:
     displayName: 'Build and Upload Angular App'
     steps:
 
-    # 1. Install Node.js
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '24.x'  # LTS Node.js version for Angular
-      displayName: 'Install Node.js'
+    # # 1. Install Node.js
+    # - task: NodeTool@0
+    #   inputs:
+    #     versionSpec: '24.x'  # LTS Node.js version for Angular
+    #   displayName: 'Install Node.js'
 
-    # 2. Install dependencies and build Angular app
-    - script: |
-        npm install -g @angular/cli
-        npm ci
-        ng build --configuration production
-      displayName: 'Install & Build Angular App'
+    # # 2. Install dependencies and build Angular app
+    # - script: |
+    #     npm install -g @angular/cli
+    #     npm ci
+    #     ng build --configuration production
+    #   displayName: 'Install & Build Angular App'
 
     # 3. Clear S3 bucket (remove all files/folders)
     - task: AWSCLI@1
       inputs:
         awsCredentials: 'aws-s3-connection'  # Use your AWS service connection
         regionName: 'us-east-1'
-        command: 's3 rm'
-        arguments: 's3://test.bd-book.com --recursive'
+        command: 's3 rm s3://test.bd-book.com --recursive'
       displayName: 'Clear S3 Bucket'
 
     # 4. Upload Angular build (dist folder) to S3
