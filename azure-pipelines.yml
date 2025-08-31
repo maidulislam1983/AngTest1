@@ -1,32 +1,54 @@
-
-
 trigger:
-- main
+  branches:
+    include:
+      - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '24.x'
-  displayName: 'Install Node.js'
+stages:
+- stage: BuildAndDeploy
+  displayName: 'Build Angular App and Deploy to S3'
+  jobs:
+  - job: Build
+    displayName: 'Build and Upload Angular App'
+    steps:
 
-- script: |
-    npm install -g @angular/cli
-    npm install
-    ng build
-  displayName: 'npm install and build'
+    # 1. Install Node.js
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '24.x'
+      displayName: 'Install Node.js'
 
-# Node.js with Angular
-- task: S3Upload@1
-  inputs:
-    awsCredentials: 'aws-s3-connection'
-    regionName: 'us-east-1'
-    bucketName: 'test.bd-book.com'
-    globExpressions: '**'
-    logRequest: true
-    logResponse: true
-# Build a Node.js project that uses Angular.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+    # 2. Install dependencies & build Angular
+    - script: |
+        npm install -g @angular/cli
+        npm install
+        ng build --configuration production
+      displayName: 'Install & Build Angular App'
+
+    # 3. Configure AWS CLI
+    - script: |
+        aws configure set aws_access_key_id $(AWS_ACCESS_KEY_ID)
+        aws configure set aws_secret_access_key $(AWS_SECRET_ACCESS_KEY)
+        aws configure set default.region us-east-1
+      displayName: 'Configure AWS CLI'
+
+    # 4. Delete all existing files from S3 bucket
+    - script: |
+        aws s3 rm s3://test.bd-book.com --recursive
+      displayName: 'Clear S3 Bucket'
+
+    # 5. Upload dist folder to S3
+    - task: S3Upload@1
+      displayName: 'Upload Angular Build to S3'
+      inputs:
+        awsCredentials: 'aws-s3-connection'  # Service connection in Azure DevOps
+        regionName: 'us-east-1'
+        bucketName: 'test.bd-book.com'
+        sourceFolder: 'dist'
+        globExpressions: '**'
+        targetFolder: ''
+        createBucket: false
+        logRequest: true
+        logResponse: true
