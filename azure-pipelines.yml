@@ -32,9 +32,11 @@ stages:
          displayName: Clear S3 Bucket
          inputs:
           awsCredentials: aws-s3-connection
-          awsRegion: us-east-1
+          regionName: us-east-1
           awsCommand: s3
           awsSubCommand: 'rm s3://test.bd-book.com --recursive'
+          logRequest: true
+          logResponse: true
        - task: S3Upload@1
          displayName: Upload dist folder to S3
          inputs:
