@@ -3,52 +3,49 @@ trigger:
     include:
       - main
 
+pool:
+  vmImage: 'ubuntu-latest'
+
 stages:
-- stage: Deploy
+- stage: BuildAndDeploy
+  displayName: 'Build Angular and Deploy to S3'
   jobs:
-  - job: DeployToS3
-    pool:
-      vmImage: ubuntu-latest
+  - job: Build
+    displayName: 'Build and Upload Angular App'
     steps:
-    # Install Node.js
+
+    # 1. Install Node.js
     - task: NodeTool@0
       inputs:
-        versionSpec: '24.x'
+        versionSpec: '24.x'  # LTS Node.js version for Angular
       displayName: 'Install Node.js'
 
-    # Install Angular and build project
-    - task: CmdLine@2
-      displayName: 'Install dependencies and build Angular app'
-      inputs:
-        script: |
-          npm install -g @angular/cli
-          npm install
-          ng build --configuration production
+    # 2. Install dependencies and build Angular app
+    - script: |
+        npm install -g @angular/cli
+        npm ci
+        ng build --configuration production
+      displayName: 'Install & Build Angular App'
 
-    # # **AWS CLI Install**
-    # - script: |
-    #     sudo apt-get update
-    #     sudo apt-get install -y awscli
-    #   displayName: 'Install AWS CLI'
-
-    # **Clear S3 Bucket**
+    # 3. Clear S3 bucket (remove all files/folders)
     - task: AWSCLI@1
       inputs:
-        awsCredentials: 'aws-s3-connection'
+        awsCredentials: 'aws-s3-connection'  # Use your AWS service connection
         regionName: 'us-east-1'
         command: 's3 rm'
         arguments: 's3://test.bd-book.com --recursive'
       displayName: 'Clear S3 Bucket'
 
-    # **Upload dist folder**
+    # 4. Upload Angular build (dist folder) to S3
     - task: S3Upload@1
+      displayName: 'Upload dist folder to S3'
       inputs:
         awsCredentials: 'aws-s3-connection'
         regionName: 'us-east-1'
         bucketName: 'test.bd-book.com'
-        sourceFolder: 'dist'
-        globExpressions: '**'
+        sourceFolder: 'dist'           # Only dist folder
+        globExpressions: '**/*'        # All files inside dist
+        targetFolder: ''               # Root of the bucket
         createBucket: false
         logRequest: true
         logResponse: true
-      displayName: 'Upload dist folder to S3'
