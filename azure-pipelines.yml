@@ -44,7 +44,7 @@ stages:
           awsCredentials: aws-s3-connection
           regionName: us-east-1
           bucketName: test.bd-book.com
-          sourceFolder: dist/test1
+          sourceFolder: dist/test1/browser
           globExpressions: "**/*"
           targetFolder: ""
           createBucket: false
