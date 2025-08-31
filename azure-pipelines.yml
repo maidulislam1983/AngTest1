@@ -27,6 +27,7 @@ stages:
 
     # **AWS CLI Install**
     - script: |
+        sudo apt-get update
         sudo apt-get install -y awscli
       displayName: 'Install AWS CLI'
 
@@ -45,7 +46,7 @@ stages:
         awsCredentials: 'aws-s3-connection'
         regionName: 'us-east-1'
         bucketName: 'test.bd-book.com'
-        sourceFolder: 'dist/test1'
+        sourceFolder: 'dist'
         globExpressions: '**'
         createBucket: false
         logRequest: true
