@@ -25,11 +25,11 @@ stages:
           npm install
           ng build --configuration production
 
-    # **AWS CLI Install**
-    - script: |
-        sudo apt-get update
-        sudo apt-get install -y awscli
-      displayName: 'Install AWS CLI'
+    # # **AWS CLI Install**
+    # - script: |
+    #     sudo apt-get update
+    #     sudo apt-get install -y awscli
+    #   displayName: 'Install AWS CLI'
 
     # **Clear S3 Bucket**
     - task: AWSCLI@1
