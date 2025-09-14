@@ -6,7 +6,7 @@ steps:
     regionName: us-east-1
     awsCommand: s3
     awsSubCommand: 'rm'
-    awsArguments: 's3://beta.bd-book.com --recursive'
+    awsArguments: 's3://$(bucketName) --recursive'
     logRequest: true
     logResponse: true
  - task: S3Upload@1
