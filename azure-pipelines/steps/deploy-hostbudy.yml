@@ -1,0 +1,26 @@
+﻿
+steps:
+  - task: PowerShell@2
+    displayName: 'Deploy Web App with MSDeploy'
+    inputs:
+      targetType: inline
+      script: |
+        # Build full source path (works in YAML pipelines)
+        $sourcePath = "$(Pipeline.Workspace)\a\Books.Web.Api"
+
+        Write-Host "Deploying from $sourcePath to site $(SiteName) at $(ServiceUrl)"
+
+        # Run MSDeploy with arguments
+        & "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
+          "-verb:sync" `
+          "-source:contentPath=$sourcePath" `
+          "-dest:contentPath=$(SiteName),computerName=$(ServiceUrl),userName=$(UserName),password=$(Password),authtype=Basic,includeAcls=False" `
+          "-allowUntrusted" `
+          "-disableLink:AppPoolExtension" `
+          "-disableLink:ContentExtension" `
+          "-disableLink:CertificateExtension" `
+          "-enableRule:AppOffline" `
+          "-enableRule:Delete"
+        if ($LASTEXITCODE -ne 0) {
+          throw "MSDeploy failed with exit code $LASTEXITCODE"
+        }   

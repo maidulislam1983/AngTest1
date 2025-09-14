@@ -1,0 +1,36 @@
+steps:
+  # Detect Target Framework and map to SDK version
+  - task: PowerShell@2
+    displayName: "Auto Detect .NET SDK version"
+    inputs:
+      targetType: inline
+      script: |
+        $tfm = Select-String -Path "**/*.csproj" -Pattern "<TargetFramework>(.*)</TargetFramework>" | % { $_.Matches[0].Groups[1].Value }
+        Write-Host "Detected TargetFramework: $tfm"
+        switch -Regex ($tfm) {
+            "^net10\.0" { Write-Host "##vso[task.setvariable variable=dotnetVersion]10.x" }
+            "^net9\.0" { Write-Host "##vso[task.setvariable variable=dotnetVersion]9.x" }
+            "^net8\.0" { Write-Host "##vso[task.setvariable variable=dotnetVersion]8.x" }
+            "^net7\.0" { Write-Host "##vso[task.setvariable variable=dotnetVersion]7.x" }
+            "^net6\.0" { Write-Host "##vso[task.setvariable variable=dotnetVersion]6.x" }
+            default   { Write-Error "Unsupported framework: $tfm" }
+        }
+
+  # Echo the detected version (for log visibility)
+  - script: |
+      echo "DotNet Version to install: $(dotnetVersion)"
+    displayName: "Echo detected .NET version"
+
+  # Install the auto-detected .NET SDK
+  - task: UseDotNet@2
+    displayName: "Install .NET SDK (auto-detected)"
+    inputs:
+      packageType: 'sdk'
+      version: $(dotnetVersion)
+
+  # Restore NuGet packages
+  - task: DotNetCoreCLI@2
+    displayName: "Restore packages"
+    inputs:
+      command: 'restore'
+      projects: '$(solution)'

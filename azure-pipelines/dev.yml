@@ -1,0 +1,19 @@
+# azure-pipelines/dev.yaml
+trigger:
+  branches:
+    include:
+      - dev
+      - main
+
+variables:
+- template: vars/dev.yml
+
+stages:
+  - stage: BuildWithPublishBuildArtifacts
+    jobs:
+      - template: jobs/build.yml      
+
+  # - stage: Test
+  #   dependsOn: BuildWithPublishBuildArtifacts
+  #   jobs:
+  #     - template: jobs/test.yml
