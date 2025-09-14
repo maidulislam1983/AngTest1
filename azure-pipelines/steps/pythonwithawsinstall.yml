@@ -1,0 +1,10 @@
+steps:
+ - task: UsePythonVersion@0
+   inputs:
+    versionSpec: 3.x
+   displayName: Use Python 3
+ - script: |
+    pip install --upgrade pip
+    pip install awscli --upgrade
+   displayName: Install AWS CLI via pip
+
