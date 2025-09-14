@@ -1,5 +1,5 @@
 variables:
-  buildConfiguration: Release
+  buildConfiguration: production
   buildPlatform: Any CPU
   nodeVersion: '24.x'
 
@@ -11,8 +11,7 @@ variables:
 
   azureServiceConnection: ''
   webAppName: ''
-  iisSiteName: ''  
-  //buildConfiguration: 'Release'
+  iisSiteName: ''    
   
   # Use pipeline variables; mark sensitive ones as secret in DevOps
   SourcePath: 'a\Books.Web.Api'

@@ -6,6 +6,6 @@ steps:
   - script: |
      npm install -g @angular/cli
      npm ci
-     ng build --configuration production
+     ng build --configuration $(buildConfiguration)
     displayName: Install & Build Angular App
 
