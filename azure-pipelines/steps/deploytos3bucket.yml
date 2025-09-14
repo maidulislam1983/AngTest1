@@ -2,7 +2,7 @@ steps:
  - task: AWSCLI@1
    displayName: Clear S3 Bucket
    inputs:
-    awsCredentials: aws-s3-connection
+    awsCredentials: '$(awsCredentials)'
     regionName: us-east-1
     awsCommand: s3
     awsSubCommand: 'rm'
@@ -12,10 +12,10 @@ steps:
  - task: S3Upload@1
    displayName: Upload dist folder to S3
    inputs:
-    awsCredentials: aws-s3-connection
-    regionName: us-east-1
-    bucketName: beta.bd-book.com
-    sourceFolder: dist/test1/browser
+    awsCredentials: '$(awsCredentials)'
+    regionName: '$(regionName)'
+    bucketName: '$(bucketName)'
+    sourceFolder: '$(sourceFolder)'
     globExpressions: "**/*"
     targetFolder: ""
     createBucket: false

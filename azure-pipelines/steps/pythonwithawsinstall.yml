@@ -7,4 +7,3 @@ steps:
     pip install --upgrade pip
     pip install awscli --upgrade
    displayName: Install AWS CLI via pip
-
